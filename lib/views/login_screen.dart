@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:khdmti_project/comme_widget/custom_form_filde.dart';
+import 'package:khdmti_project/views/sign_up_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,9 +10,9 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-final FormKey = GlobalKey<FormState>();
-
 class _LoginScreenState extends State<LoginScreen> {
+  final formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -50,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               Form(
-                  key: FormKey,
+                  key: formKey,
                   child: Column(
                     children: [
                       SizedBox(
@@ -61,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         hintText: "أدخل رقم الهاتف أو البريد",
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "dd";
+                            return "الرجاء ادخال الهاتف أو البريد صحيحة";
                           }
                           return null;
                         },
@@ -85,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         hintText: "أدخل كلمة المرور",
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "dd";
+                            return "الرجاء ادخال كلمة مرور صحيحة";
                           }
                           return null;
                         },
@@ -112,13 +113,122 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: ElevatedButton.styleFrom(
                               elevation: 2,
                               shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadiusGeometry.circular(12)),
+                                  borderRadius: BorderRadius.circular(12)),
                               fixedSize: Size(size.width * 0.9, 62)),
-                          onPressed: () {},
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              // TODO: Handle login
+                            }
+                          },
                           child: Text("تسجيل الدخول"))
                     ],
-                  ))
+                  )),
+              SizedBox(
+                height: 60,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    height: 20,
+                    width: size.width * 0.35,
+                    child: Divider(
+                      color: Colors.grey,
+                      thickness: 0.7,
+                    ),
+                  ),
+                  Text(
+                    " أو سجل عبر",
+                    style: theme.textTheme.headlineSmall,
+                  ),
+                  SizedBox(
+                    height: 20,
+                    width: size.width * 0.35,
+                    child: Divider(
+                      color: Colors.grey,
+                      thickness: 0.7,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: size.width * .06),
+                    width: size.width * .45,
+                    height: size.height * .07,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          "فيسبوك",
+                          style: theme.textTheme.titleMedium!
+                              .copyWith(fontSize: 20),
+                        ),
+                        Icon(
+                          Icons.facebook,
+                          color: Colors.blue,
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: size.width * .06),
+                    width: size.width * .40,
+                    height: size.height * .07,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          "جوجل",
+                          style: theme.textTheme.titleMedium!
+                              .copyWith(fontSize: 20),
+                        ),
+                        SvgPicture.asset(
+                          "assets/google.svg",
+                          height: 20,
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return SignUpScreen();
+                    },
+                  ));
+                },
+                child: Text.rich(
+                  TextSpan(text: "ليس لديك حساب؟ ", children: [
+                    TextSpan(
+                        text: "أنشئ حساباً جديداً",
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold))
+                  ]),
+                ),
+              )
             ],
           ),
         ),
