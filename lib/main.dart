@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:khdmti_project/app/theme/light_theme.dart';
 import 'package:khdmti_project/routing/router.dart';
 import 'package:khdmti_project/utils/localShared/preference_manager.dart';
-import 'package:khdmti_project/utils/theme/ligth_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       title: 'Flutter Project',
-      theme: ligthTheme,
+      theme: lightTheme,
     );
   }
 }

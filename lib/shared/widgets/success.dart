@@ -1,0 +1,20 @@
+import 'package:flutter/material.dart';
+
+class CustomSuccessWidget {
+  static void showSuccess(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.green[400],
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const SizedBox(width: 10),
+            Text(message),
+            const Icon(Icons.check, color: Colors.white),
+            const SizedBox(width: 10),
+          ],
+        ),
+      ),
+    );
+  }
+}
