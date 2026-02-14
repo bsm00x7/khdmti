@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
+import 'package:khdmti_project/views/buttom_nav.dart';
 import 'package:khdmti_project/views/home/home_screen.dart';
 import 'package:khdmti_project/views/login_screen.dart';
 import 'package:khdmti_project/views/sign_up_screen.dart';
@@ -10,7 +11,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // Auth state notifier for GoRouter
 class AuthNotifier extends ChangeNotifier {
   late final StreamSubscription<AuthState> _subscription;
-
   AuthNotifier() {
     _subscription = Supabase.instance.client.auth.onAuthStateChange.listen(
       (AuthState data) {
@@ -46,12 +46,10 @@ final router = GoRouter(
   redirect: (context, state) {
     final isAuthenticated = _isAuthenticated();
     final path = state.matchedLocation;
-
     // Define route categories
     const splash = '/';
     const authRoutes = ['/loginScreen', '/SignUpScreen'];
-    const protectedRoutes = ['/HomeScreen'];
-
+    const protectedRoutes = ['/HomeScreen', '/ButtomNav'];
     // Splash screen - always accessible
     if (path == splash) {
       return null;
@@ -65,10 +63,10 @@ final router = GoRouter(
       return null;
     }
 
-    // Auth routes - redirect to home if already authenticated
+    // Auth routes - redirect to ButtomNav if already authenticated
     if (authRoutes.contains(path)) {
       if (isAuthenticated) {
-        return '/HomeScreen';
+        return '/ButtomNav';
       }
       return null;
     }
@@ -96,6 +94,11 @@ final router = GoRouter(
       path: '/HomeScreen',
       name: 'home',
       builder: (context, state) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: '/ButtomNav',
+      name: 'ButtomNav',
+      builder: (context, state) => BottomNav(),
     ),
   ],
   errorBuilder: (context, state) {

@@ -76,6 +76,7 @@ class _LoginScreenContent extends StatelessWidget {
                         }
                         return null;
                       },
+                      prefixIcon: Icon(Icons.email),
                     ),
                     const SizedBox(height: 20),
                     Align(
@@ -87,6 +88,7 @@ class _LoginScreenContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     CustomTextFormField(
+                      prefixIcon: Icon(Icons.password),
                       controller: controller.passwordController,
                       obscureText: controller.obscurePassword,
                       theme: theme,

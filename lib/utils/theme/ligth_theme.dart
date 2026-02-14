@@ -13,6 +13,10 @@ ThemeData ligthTheme = ThemeData(
           ))),
     ),
     textTheme: TextTheme(
+        displayMedium: TextStyle(
+            color: Color(0xff111827),
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
         titleMedium: TextStyle(
             color: Color(0xff334155),
             fontSize: 14,
@@ -22,6 +26,9 @@ ThemeData ligthTheme = ThemeData(
             fontSize: 14,
             fontWeight: FontWeight.w300),
         titleLarge: TextStyle(
-            color: Color(0xff0F172A),
-            fontWeight: FontWeight.bold,
-            fontSize: 50)));
+            color: Color(0xff0F172A), fontWeight: FontWeight.bold, fontSize: 50)
+
+        /// name profile
+        ///
+
+        ));

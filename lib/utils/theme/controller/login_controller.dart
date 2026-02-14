@@ -67,7 +67,7 @@ class LoginController extends ChangeNotifier {
 
           // Navigate to home screen
           if (context.mounted) {
-            context.go('/HomeScreen');
+            context.go('/ButtomNav');
           }
         }
       } on AuthException catch (e) {
