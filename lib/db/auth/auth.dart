@@ -9,7 +9,7 @@ class Auth extends ChangeNotifier {
     return _supabase.auth.signUp(
       email: user.email,
       password: user.password,
-      data: {'firstName': user.firstName, 'lastName': user.lastName},
+      data: {'name': user.fullname},
     );
   }
 
@@ -23,14 +23,14 @@ class Auth extends ChangeNotifier {
   final authSubscription = _supabase.auth.onAuthStateChange.listen((data) {
     final AuthChangeEvent event = data.event;
 
-    ///final Session? session = data.session;
+    final Session? session = data.session;
     switch (event) {
       case AuthChangeEvent.initialSession:
       // handle initial session
       case AuthChangeEvent.signedIn:
       // handle signed in
+
       case AuthChangeEvent.signedOut:
-      // handle signed out
       case AuthChangeEvent.passwordRecovery:
       // handle password recovery
       case AuthChangeEvent.tokenRefreshed:

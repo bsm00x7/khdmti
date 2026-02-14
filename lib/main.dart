@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:khdmti_project/routing/router.dart';
 import 'package:khdmti_project/utils/localShared/preference_manager.dart';
 import 'package:khdmti_project/utils/theme/ligth_theme.dart';
-import 'package:khdmti_project/views/splash_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -12,7 +12,6 @@ Future<void> main() async {
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVscG52Ym1ra294d2dtbndyanlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MzUyNjQsImV4cCI6MjA4NjUxMTI2NH0.XhGKtuMWqAHutHsnOuVrB-XxjGS_U0yuIAfwnO62o1I',
   );
-
   runApp(const MyApp());
 }
 
@@ -21,11 +20,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       debugShowCheckedModeBanner: false,
       title: 'Flutter Project',
       theme: ligthTheme,
-      home: SplashScreen(),
     );
   }
 }
