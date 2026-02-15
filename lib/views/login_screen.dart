@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:khdmti_project/comme_widget/custom_form_filde.dart';
-import 'package:khdmti_project/utils/theme/controller/login_controller.dart';
+import 'package:khdmti_project/controller/login_controller.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {

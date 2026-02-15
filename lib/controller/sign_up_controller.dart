@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -8,9 +10,7 @@ import 'package:khdmti_project/utils/widgets/looding_indicator.dart';
 import 'package:khdmti_project/utils/widgets/success.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Enhanced SignUp Controller with Rate Limit Protection
 class SignUpController extends ChangeNotifier {
-  // Form and Controllers
   final formKeySignUp = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -280,7 +280,7 @@ class SignUpController extends ChangeNotifier {
     if (context.mounted) {
       CustomErrorWidgetNew.showError(
         context,
-        'Too many signup attempts. Please wait ${remainingSignupCooldown} seconds before trying again.',
+        'Too many signup attempts. Please wait $remainingSignupCooldown seconds before trying again.',
       );
     }
   }
@@ -519,7 +519,7 @@ class SignUpController extends ChangeNotifier {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
+                        color: Colors.blue.withValues(alpha: .1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -552,7 +552,7 @@ class SignUpController extends ChangeNotifier {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.05),
+                        color: Colors.blue.withValues(alpha: .05),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -578,10 +578,10 @@ class SignUpController extends ChangeNotifier {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.1),
+                        color: Colors.orange.withValues(alpha: .1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: Colors.orange.withOpacity(0.3),
+                          color: Colors.orange.withValues(alpha: .3),
                           width: 1,
                         ),
                       ),
@@ -830,7 +830,6 @@ enum PasswordStrength {
         return Colors.green;
     }
   }
-
   double get progress {
     switch (this) {
       case PasswordStrength.weak:

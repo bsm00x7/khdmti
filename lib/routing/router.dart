@@ -50,9 +50,12 @@ final router = GoRouter(
     const splash = '/';
     const authRoutes = ['/loginScreen', '/SignUpScreen'];
     const protectedRoutes = ['/HomeScreen', '/ButtomNav'];
-    // Splash screen - always accessible
+    // Splash screen - redirect if already authenticated
     if (path == splash) {
-      return null;
+      if (isAuthenticated) {
+        return '/ButtomNav';
+      }
+      return null; // Allow splash to show initially for non-auth users
     }
 
     // Protected routes - require authentication

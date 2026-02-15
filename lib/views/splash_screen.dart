@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:khdmti_project/utils/assets.dart';
-import 'package:khdmti_project/views/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,11 +20,10 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // Start the timer when the widget initializes
     Timer(const Duration(seconds: 2), () {
-      // Callback function: navigate to the main screen after 3 seconds
+      // Navigate using GoRouter — the redirect logic will check auth state
+      // and send to /loginScreen if not authenticated
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-        );
+        context.go('/ButtomNav');
       }
     });
   }

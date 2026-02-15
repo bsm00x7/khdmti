@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:khdmti_project/app/theme/light_theme.dart';
+import 'package:khdmti_project/constants.dart';
 import 'package:khdmti_project/routing/router.dart';
 import 'package:khdmti_project/utils/localShared/preference_manager.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,10 +9,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await PreferenceManager().init();
   await Supabase.initialize(
-    url: 'https://elpnvbmkkoxwgmnwrjyq.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVscG52Ym1ra294d2dtbndyanlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MzUyNjQsImV4cCI6MjA4NjUxMTI2NH0.XhGKtuMWqAHutHsnOuVrB-XxjGS_U0yuIAfwnO62o1I',
-  );
+      url: Constants.supabaseUrl, anonKey: Constants.supabaseAnnonKey);
   runApp(const MyApp());
 }
 

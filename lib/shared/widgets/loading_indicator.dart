@@ -10,7 +10,7 @@ class LoadingIndicator {
         showDialog(
           context: context,
           barrierDismissible: false,
-          barrierColor: Colors.black.withOpacity(0.3),
+          barrierColor: Colors.black.withValues(alpha: .3),
           builder: (_) => const Center(
             child: CircularProgressIndicator(color: Colors.blueAccent),
           ),
