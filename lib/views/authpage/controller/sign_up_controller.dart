@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:khdmti_project/db/auth/auth.dart';
+import 'package:khdmti_project/db/database/db.dart';
 import 'package:khdmti_project/model/user_model.dart';
 import 'package:khdmti_project/utils/widgets/custom_error_widget.dart';
 import 'package:khdmti_project/utils/widgets/looding_indicator.dart';
@@ -207,6 +208,7 @@ class SignUpController extends ChangeNotifier {
           throw TimeoutException('Request timed out after 30 seconds');
         },
       );
+      await DataBase().insertToDataBase(response);
 
       debugPrint('SignUp: User created successfully');
       debugPrint('SignUp: Session exists: ${response.session != null}');
@@ -420,6 +422,7 @@ class SignUpController extends ChangeNotifier {
         // Special handling for rate limit
         return 'Too many signup attempts detected. Please wait a few minutes and try again.';
       case '500':
+        return 'Server error. Our team has been notified. Please try again later.';
       case '502':
       case '503':
       case '504':
@@ -830,6 +833,7 @@ enum PasswordStrength {
         return Colors.green;
     }
   }
+
   double get progress {
     switch (this) {
       case PasswordStrength.weak:

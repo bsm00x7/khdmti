@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:khdmti_project/comme_widget/custom_form_filde.dart';
-import 'package:khdmti_project/controller/login_controller.dart';
+import 'package:khdmti_project/views/authpage/controller/login_controller.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -119,7 +120,7 @@ class _LoginScreenContent extends StatelessWidget {
                     const SizedBox(height: 30),
                     GestureDetector(
                       onTap: () {
-                        controller.onForgotPasswordPressed(context: context);
+                        context.push("/forgetPassword");
                       },
                       child: Align(
                         alignment: Alignment.topLeft,

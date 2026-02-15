@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:khdmti_project/comme_widget/custom_form_filde.dart';
-import 'package:khdmti_project/controller/sign_up_controller.dart';
-import 'package:khdmti_project/views/login_screen.dart';
+import 'package:khdmti_project/views/authpage/controller/sign_up_controller.dart';
+import 'package:khdmti_project/views/authpage/login_screen.dart';
 import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {

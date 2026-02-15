@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:khdmti_project/comme_widget/responsive_avatar.dart';
-import 'package:khdmti_project/controller/profile_controller.dart';
+import 'package:khdmti_project/views/nav/controller/profile_controller.dart';
 import 'package:khdmti_project/db/auth/auth.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -10,7 +10,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ProfileController()..loadProfileImage(),
+      create: (_) => ProfileController()..init(),
       child: const _ProfileScreenBody(),
     );
   }
@@ -87,9 +87,9 @@ class _ProfileScreenBody extends StatelessWidget {
               ),
               const SizedBox(height: 9),
               Text(
-                Auth.user?.email ?? '',
-                style: theme.textTheme.headlineSmall!
-                    .copyWith(color: Colors.blue),
+                "Job",
+                style:
+                    theme.textTheme.headlineSmall!.copyWith(color: Colors.blue),
               ),
 
               const Spacer(),

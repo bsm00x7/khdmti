@@ -4,11 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khdmti_project/db/database/db.dart';
 import 'package:khdmti_project/db/storage/storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:khdmti_project/db/auth/auth.dart';
 
 class ProfileController extends ChangeNotifier {
+  void init() async {
+    await loadProfileImage();
+    await loadProfileData();
+  }
+
   // ── State ──
   File? _imageFile;
   String? _imageUrl;
@@ -23,6 +29,8 @@ class ProfileController extends ChangeNotifier {
   bool get isUploading => _isUploading;
   bool get isSigningOut => _isSigningOut;
 
+  final String userId = Auth.user!.id;
+
   final ImagePicker _picker = ImagePicker();
 
   // ──────────────────────────────────────────────
@@ -34,7 +42,6 @@ class ProfileController extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final String userId = Auth.user!.id;
       final String fileName = '$userId.png';
 
       final url = await Storage()
@@ -125,7 +132,7 @@ class ProfileController extends ChangeNotifier {
     } catch (e) {
       debugPrint('ProfileController: Upload error – $e');
       if (!context.mounted) return;
-      _showError(context, 'فشل رفع الصورة. حاول مرة أخرى.');
+      _showError(context, e.toString());
     } finally {
       _isUploading = false;
       notifyListeners();
@@ -430,5 +437,10 @@ class ProfileController extends ChangeNotifier {
         ),
       ),
     );
+  }
+
+  Future<void> loadProfileData() async {
+    final data = await DataBase().profileData(value: userId);
+    print(data);
   }
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
-import 'package:khdmti_project/views/buttom_nav.dart';
+import 'package:khdmti_project/views/nav/buttom_nav.dart';
 import 'package:khdmti_project/views/home/home_screen.dart';
-import 'package:khdmti_project/views/login_screen.dart';
-import 'package:khdmti_project/views/sign_up_screen.dart';
-import 'package:khdmti_project/views/splash_screen.dart';
+import 'package:khdmti_project/views/authpage/login_screen.dart';
+import 'package:khdmti_project/views/authpage/sign_up_screen.dart';
+import 'package:khdmti_project/views/splashscreenPage/splash_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Auth state notifier for GoRouter
