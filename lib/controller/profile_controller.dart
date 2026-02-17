@@ -443,6 +443,5 @@ class ProfileController extends ChangeNotifier {
 
   Future<void> loadProfileData() async {
     final data = await DataBase().profileData(value: userId);
-    print(data);
   }
 }
