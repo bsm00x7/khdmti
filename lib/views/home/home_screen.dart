@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:khdmti_project/app/routing/router.dart';
 import 'package:khdmti_project/comme_widget/responsive_avatar.dart';
 import 'package:khdmti_project/controller/home_controller.dart';
 import 'package:khdmti_project/utils/responsive/responsive_helper.dart';
+import 'package:khdmti_project/views/home/screen/notification_screen.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -131,7 +130,12 @@ class HomeScreen extends StatelessWidget {
                                 color: isDark ? Colors.white : Colors.black,
                               ),
                               onPressed: () {
-                                context.push(AppRoutes.notifications);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const NotificationScreen(),
+                                  ),
+                                );
                               },
                             ),
                           ),
