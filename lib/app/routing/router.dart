@@ -59,7 +59,7 @@ class AppRoutes {
     home,
     bottomNav,
     profile,
-    notifications, // ✅ protected — requires login
+    notifications,
   ];
 
   static bool isAuthRoute(String path) => _authRoutes.contains(path);
