@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:khdmti_project/views/authpage/forget_screen.dart';
+import 'package:khdmti_project/views/message/chat_list_screen.dart';
 import 'package:khdmti_project/views/nav/buttom_nav.dart';
 import 'package:khdmti_project/views/home/home_screen.dart';
 import 'package:khdmti_project/views/authpage/login_screen.dart';
@@ -108,6 +109,11 @@ final router = GoRouter(
       path: '/forgetPassword',
       name: 'forgetPassword',
       builder: (context, state) => ForgetScreen(),
+    ),
+    GoRoute(
+      path: '/ChatsListScreen',
+      name: 'ChatsListScreen',
+      builder: (context, state) => ChatsListScreen(),
     ),
   ],
   errorBuilder: (context, state) {

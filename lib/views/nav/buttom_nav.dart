@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:khdmti_project/views/home/home_screen.dart';
-import 'package:khdmti_project/views/message/message_screen.dart';
+import 'package:khdmti_project/views/message/chat_list_screen.dart';
 import 'package:khdmti_project/views/profile/profile_screen.dart';
 import 'package:khdmti_project/views/search/search_screen.dart';
 
@@ -18,7 +18,7 @@ class _BottomNavState extends State<BottomNav> {
     List<Widget> screen = [
       HomeScreen(),
       SearchScreen(),
-      MessageScreen(),
+      ChatsListScreen(),
       ProfileScreen()
     ];
     return Scaffold(
