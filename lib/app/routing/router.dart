@@ -1,25 +1,24 @@
 import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
+import 'package:khdmti_project/views/home/screen/notification_screen.dart';
 import 'package:khdmti_project/views/nav/buttom_nav.dart';
 import 'package:khdmti_project/views/home/home_screen.dart';
 import 'package:khdmti_project/views/authpage/login_screen.dart';
 import 'package:khdmti_project/views/authpage/sign_up_screen.dart';
+import 'package:khdmti_project/views/profile/profile_screen.dart';
 import 'package:khdmti_project/views/splashscreenPage/splash_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// Auth state notifier for GoRouter
+// ── Auth State Notifier ───────────────────────────────────────────────────────
 class AuthNotifier extends ChangeNotifier {
   late final StreamSubscription<AuthState> _subscription;
+
   AuthNotifier() {
     _subscription = Supabase.instance.client.auth.onAuthStateChange.listen(
-      (AuthState data) {
-        notifyListeners();
-      },
+      (AuthState data) => notifyListeners(),
       onError: (error) {
-        if (kDebugMode) {
-          print('Auth error: $error');
-        }
+        if (kDebugMode) print('Auth error: $error');
       },
       cancelOnError: false,
     );
@@ -32,80 +31,101 @@ class AuthNotifier extends ChangeNotifier {
   }
 }
 
-// Helper function to check authentication status
+// ── Auth Check ────────────────────────────────────────────────────────────────
 bool _isAuthenticated() {
   final session = Supabase.instance.client.auth.currentSession;
   return session != null && session.user.emailConfirmedAt != null;
 }
 
-// GoRouter configuration
+// ── Route Constants ───────────────────────────────────────────────────────────
+class AppRoutes {
+  AppRoutes._();
+
+  static const String splash = '/';
+  static const String login = '/loginScreen';
+  static const String signUp = '/SignUpScreen';
+  static const String home = '/HomeScreen';
+  static const String bottomNav = '/ButtomNav';
+  static const String profile = '/profileScreen';
+  static const String notifications = '/notificationScreen';
+
+  static const List<String> _authRoutes = [login, signUp];
+
+  static const List<String> _protectedRoutes = [
+    home,
+    bottomNav,
+    profile,
+    notifications, // ✅ protected — requires login
+  ];
+
+  static bool isAuthRoute(String path) => _authRoutes.contains(path);
+  static bool isProtectedRoute(String path) => _protectedRoutes.contains(path);
+}
+
+// ── Router ────────────────────────────────────────────────────────────────────
 final router = GoRouter(
-  initialLocation: '/',
+  initialLocation: AppRoutes.splash,
   debugLogDiagnostics: kDebugMode,
   refreshListenable: AuthNotifier(),
+  redirectLimit: 10,
   redirect: (context, state) {
     final isAuthenticated = _isAuthenticated();
     final path = state.matchedLocation;
-    // Define route categories
-    const splash = '/';
-    const authRoutes = ['/loginScreen', '/SignUpScreen'];
-    const protectedRoutes = ['/HomeScreen', '/ButtomNav'];
-    // Splash screen - always accessible
-    if (path == splash) {
-      return null;
+
+    // Splash — always accessible
+    if (path == AppRoutes.splash) return null;
+
+    // Protected routes — must be logged in
+    if (AppRoutes.isProtectedRoute(path)) {
+      return isAuthenticated ? null : AppRoutes.login;
     }
 
-    // Protected routes - require authentication
-    if (protectedRoutes.contains(path)) {
-      if (!isAuthenticated) {
-        return '/loginScreen';
-      }
-      return null;
+    // Auth routes — redirect away if already logged in
+    if (AppRoutes.isAuthRoute(path)) {
+      return isAuthenticated ? AppRoutes.bottomNav : null;
     }
 
-    // Auth routes - redirect to ButtomNav if already authenticated
-    if (authRoutes.contains(path)) {
-      if (isAuthenticated) {
-        return '/ButtomNav';
-      }
-      return null;
-    }
-
-    // Default: allow access
     return null;
   },
   routes: [
     GoRoute(
-      path: '/',
+      path: AppRoutes.splash,
       name: 'splash',
       builder: (context, state) => const SplashScreen(),
     ),
     GoRoute(
-      path: '/loginScreen',
+      path: AppRoutes.login,
       name: 'login',
       builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
-      path: '/SignUpScreen',
+      path: AppRoutes.signUp,
       name: 'signup',
       builder: (context, state) => const SignUpScreen(),
     ),
     GoRoute(
-      path: '/HomeScreen',
+      path: AppRoutes.home,
       name: 'home',
       builder: (context, state) => const HomeScreen(),
     ),
     GoRoute(
-      path: '/ButtomNav',
-      name: 'ButtomNav',
-      builder: (context, state) => BottomNav(),
+      path: AppRoutes.bottomNav,
+      name: 'bottomNav',
+      builder: (context, state) => const BottomNav(),
+    ),
+    GoRoute(
+      path: AppRoutes.profile,
+      name: 'profile',
+      builder: (context, state) => const ProfileScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.notifications,
+      name: 'notifications',
+      builder: (context, state) => const NotificationScreen(),
     ),
   ],
   errorBuilder: (context, state) {
-    if (kDebugMode) {
-      print('Navigation error: ${state.error}');
-    }
+    if (kDebugMode) print('Navigation error: ${state.error}');
     return const LoginScreen();
   },
-  redirectLimit: 10,
 );
