@@ -76,17 +76,18 @@ final router = GoRouter(
     final isAuthenticated = _isAuthenticated();
     final path = state.matchedLocation;
 
-    // Splash — always accessible
-    if (path == AppRoutes.splash) return null;
-
-    // Protected routes — must be logged in
-    if (AppRoutes.isProtectedRoute(path)) {
-      return isAuthenticated ? null : AppRoutes.login;
+    if (kDebugMode) {
+      print('🔀 path: $path | auth: $isAuthenticated');
     }
 
-    // Auth routes — redirect away if already logged in
+    if (path == AppRoutes.splash) return null;
+
     if (AppRoutes.isAuthRoute(path)) {
       return isAuthenticated ? AppRoutes.bottomNav : null;
+    }
+
+    if (AppRoutes.isProtectedRoute(path)) {
+      return isAuthenticated ? null : AppRoutes.login;
     }
 
     return null;
@@ -130,6 +131,6 @@ final router = GoRouter(
   ],
   errorBuilder: (context, state) {
     if (kDebugMode) print('Navigation error: ${state.error}');
-    return const LoginScreen();
+    return const HomeScreen();
   },
 );
