@@ -34,7 +34,11 @@ class AuthNotifier extends ChangeNotifier {
 // ── Auth Check ────────────────────────────────────────────────────────────────
 bool _isAuthenticated() {
   final session = Supabase.instance.client.auth.currentSession;
-  return session != null && session.user.emailConfirmedAt != null;
+  if (session == null) return false;
+  final expiresAt = session.expiresAt;
+  if (expiresAt == null) return true;
+  return DateTime.fromMillisecondsSinceEpoch(expiresAt * 1000)
+      .isAfter(DateTime.now());
 }
 
 // ── Route Constants ───────────────────────────────────────────────────────────
