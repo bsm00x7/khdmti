@@ -11,8 +11,8 @@ class UserProfileModel {
 
   const UserProfileModel({
     required this.id,
-    required this.jobTitle,
     this.createdAt,
+    required this.jobTitle,
     this.description,
     this.skills,
     this.completedProject = 0,

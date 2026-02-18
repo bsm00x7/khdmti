@@ -138,7 +138,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   onPressed: controller.isLoading ? null : _save,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _primary,
-                    disabledBackgroundColor: _primary.withValues(alpha: 0.5),
+                    disabledBackgroundColor: _primary.withValues(alpha: .5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -246,7 +246,7 @@ class _AvatarEditRow extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 40,
-              backgroundColor: const Color(0xff1173D4).withValues(alpha: 0.1),
+              backgroundColor: const Color(0xff1173D4).withValues(alpha: .1),
               backgroundImage: controller.imageFile != null
                   ? FileImage(controller.imageFile!)
                   : (controller.imageUrl != null
@@ -259,7 +259,7 @@ class _AvatarEditRow extends StatelessWidget {
             if (controller.isUploading)
               Positioned.fill(
                 child: CircleAvatar(
-                  backgroundColor: Colors.black.withValues(alpha: 0.4),
+                  backgroundColor: Colors.black.withValues(alpha: .4),
                   child: const CircularProgressIndicator(
                       color: Colors.white, strokeWidth: 2),
                 ),

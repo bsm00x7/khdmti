@@ -4,7 +4,7 @@ import 'package:khdmti_project/views/home/home_screen.dart';
 import 'package:khdmti_project/views/message/chat_list_screen.dart';
 import 'package:khdmti_project/views/services/post_service_screen.dart';
 import 'package:khdmti_project/views/profile/profile_screen.dart';
-import 'package:khdmti_project/views/search/search_screen.dart';
+import 'package:khdmti_project/views/requestScreen/requset_screen.dart';
 
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key});
@@ -18,7 +18,7 @@ class _BottomNavState extends State<BottomNav> {
 
   final List<Widget> _screens = const [
     HomeScreen(),
-    SearchScreen(),
+    RequestScreen(),
     ChatsListScreen(),
     ProfileScreen(),
   ];

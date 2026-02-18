@@ -19,10 +19,9 @@ class UserPostModel {
     this.sourceId,
   });
 
-  /// Create object from Supabase JSON
   factory UserPostModel.fromJson(Map<String, dynamic> json) {
     return UserPostModel(
-      id: json['id'],
+      id: json['id'] as int?,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : null,
@@ -30,21 +29,37 @@ class UserPostModel {
       postTitle: json['postTitle'],
       isEnable: json['isEnable'],
       isAvailable: json['isAvailable'],
-      description: json['discription'],
+      description: json['discription'], // ← schema typo preserved
       sourceId: json['sourceId'],
     );
   }
 
-  /// Convert object to JSON for insert/update
-  Map<String, dynamic> toJson() {
-    return {
-      if (id != null) 'id': id,
-      'id_user': idUser,
-      'postTitle': postTitle,
-      'isEnable': isEnable,
-      'isAvailable': isAvailable,
-      'discription': description,
-      'sourceId': sourceId,
-    };
+  Map<String, dynamic> toJson() => {
+        if (id != null) 'id': id,
+        'id_user': idUser,
+        'postTitle': postTitle,
+        'isEnable': isEnable,
+        'isAvailable': isAvailable,
+        'discription': description, // ← schema typo preserved
+        'sourceId': sourceId,
+      };
+
+  UserPostModel copyWith({
+    bool? isEnable,
+    bool? isAvailable,
+    String? postTitle,
+    String? description,
+    String? sourceId,
+  }) {
+    return UserPostModel(
+      id: id,
+      createdAt: createdAt,
+      idUser: idUser,
+      postTitle: postTitle ?? this.postTitle,
+      isEnable: isEnable ?? this.isEnable,
+      isAvailable: isAvailable ?? this.isAvailable,
+      description: description ?? this.description,
+      sourceId: sourceId ?? this.sourceId,
+    );
   }
 }
