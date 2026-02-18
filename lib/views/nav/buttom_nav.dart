@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:khdmti_project/utils/responsive/responsive_helper.dart';
 import 'package:khdmti_project/views/home/home_screen.dart';
 import 'package:khdmti_project/views/message/chat_list_screen.dart';
 import 'package:khdmti_project/views/profile/profile_screen.dart';
@@ -14,16 +15,38 @@ class BottomNav extends StatefulWidget {
 class _BottomNavState extends State<BottomNav> {
   int _currentIndex = 0;
 
-  // ── 4 real screens (center FAB has no screen) ─────────────
   final List<Widget> _screens = const [
-    HomeScreen(), // 0 → الرئيسية
-    SearchScreen(), // 1 → طلباتي
-    ChatsListScreen(), // 2 → رسائل
-    ProfileScreen(), // 3 → المحفظة (placeholder)
+    HomeScreen(),
+    SearchScreen(),
+    ChatsListScreen(),
+    ProfileScreen(),
+  ];
+
+  // ── Nav destinations data ──────────────────────────────────
+  static const List<_NavDestination> _destinations = [
+    _NavDestination(
+      icon: Icons.home_outlined,
+      activeIcon: Icons.home,
+      label: "الرئيسية",
+    ),
+    _NavDestination(
+      icon: Icons.receipt_long_outlined,
+      activeIcon: Icons.receipt_long,
+      label: "طلباتي",
+    ),
+    _NavDestination(
+      icon: Icons.chat_bubble_outline,
+      activeIcon: Icons.chat_bubble,
+      label: "رسائل",
+    ),
+    _NavDestination(
+      icon: Icons.person,
+      activeIcon: Icons.person_2,
+      label: "حسابي",
+    ),
   ];
 
   void _onFabTap() {
-    // TODO: open add service / post sheet
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -82,16 +105,228 @@ class _BottomNavState extends State<BottomNav> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isWeb = ResponsiveHelper.isLargeScreen(context);
 
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        body: isWeb
+            ? _WebLayout(
+                currentIndex: _currentIndex,
+                destinations: _destinations,
+                isDark: isDark,
+                screen: _screens[_currentIndex],
+                onTap: (i) => setState(() => _currentIndex = i),
+                onFabTap: _onFabTap,
+              )
+            : _MobileLayout(
+                currentIndex: _currentIndex,
+                destinations: _destinations,
+                isDark: isDark,
+                screen: _screens[_currentIndex],
+                onTap: (i) => setState(() => _currentIndex = i),
+                onFabTap: _onFabTap,
+              ),
+      ),
+    );
+  }
+}
+
+// ── Web Layout (vertical nav rail on right) ───────────────────────────────────
+
+class _WebLayout extends StatelessWidget {
+  const _WebLayout({
+    required this.currentIndex,
+    required this.destinations,
+    required this.isDark,
+    required this.screen,
+    required this.onTap,
+    required this.onFabTap,
+  });
+
+  final int currentIndex;
+  final List<_NavDestination> destinations;
+  final bool isDark;
+  final Widget screen;
+  final ValueChanged<int> onTap;
+  final VoidCallback onFabTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        // ── Main Content (left side) ──
+        Expanded(child: screen),
+
+        // ── Vertical Divider ──
+        Container(
+          width: 1,
+          color: isDark ? const Color(0xff334155) : const Color(0xffE2E8F0),
+        ),
+
+        // ── Right Vertical Nav ──
+        Container(
+          width: 100,
+          color: isDark ? const Color(0xff1E293B) : const Color(0xffFFFFFF),
+          child: SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 24),
+
+                // ── Logo / App Icon ──
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xff1173D4),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.work_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // ── FAB (Add button) ──
+                GestureDetector(
+                  onTap: onFabTap,
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: const BoxDecoration(
+                      color: Color(0xff1173D4),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  "أضف",
+                  style: TextStyle(
+                    fontFamily: "IBMPlexSansArabic",
+                    fontSize: 11,
+                    color: isDark
+                        ? const Color(0xff64748B)
+                        : const Color(0xff9CA3AF),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                Divider(
+                  color: isDark
+                      ? const Color(0xff334155)
+                      : const Color(0xffE2E8F0),
+                  indent: 16,
+                  endIndent: 16,
+                ),
+
+                const SizedBox(height: 8),
+
+                // ── Nav Items ──
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: destinations.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 4),
+                    itemBuilder: (context, index) {
+                      final dest = destinations[index];
+                      final isSelected = index == currentIndex;
+                      const activeColor = Color(0xff1173D4);
+                      final inactiveColor = isDark
+                          ? const Color(0xff64748B)
+                          : const Color(0xff9CA3AF);
+
+                      return GestureDetector(
+                        onTap: () => onTap(index),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 2),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? const Color(0xff1173D4).withOpacity(0.1)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(
+                                isSelected ? dest.activeIcon : dest.icon,
+                                color: isSelected ? activeColor : inactiveColor,
+                                size: 24,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                dest.label,
+                                style: TextStyle(
+                                  fontFamily: "IBMPlexSansArabic",
+                                  fontSize: 11,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w400,
+                                  color:
+                                      isSelected ? activeColor : inactiveColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Mobile Layout (bottom nav with FAB) ──────────────────────────────────────
+
+class _MobileLayout extends StatelessWidget {
+  const _MobileLayout({
+    required this.currentIndex,
+    required this.destinations,
+    required this.isDark,
+    required this.screen,
+    required this.onTap,
+    required this.onFabTap,
+  });
+
+  final int currentIndex;
+  final List<_NavDestination> destinations;
+  final bool isDark;
+  final Widget screen;
+  final ValueChanged<int> onTap;
+  final VoidCallback onFabTap;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: screen,
 
-      // ── Floating Action Button (center +) ──────────────────
+      // ── FAB ──
       floatingActionButton: SizedBox(
         width: 60,
         height: 60,
         child: FloatingActionButton(
-          onPressed: _onFabTap,
+          onPressed: onFabTap,
           backgroundColor: const Color(0xff1173D4),
           elevation: 4,
           shape: const CircleBorder(),
@@ -100,67 +335,56 @@ class _BottomNavState extends State<BottomNav> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-      // ── Bottom Nav ─────────────────────────────────────────
-      bottomNavigationBar: Directionality(
-        textDirection: TextDirection.rtl,
-        child: BottomAppBar(
-          color: isDark ? const Color(0xff1E293B) : const Color(0xffFFFFFF),
-          elevation: 8,
-          notchMargin: 8,
-          shape: const CircularNotchedRectangle(),
-          child: SizedBox(
-            height: 64,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                // الرئيسية
-                _NavItem(
-                  icon: Icons.home_outlined,
-                  activeIcon: Icons.home,
-                  label: "الرئيسية",
-                  index: 0,
-                  currentIndex: _currentIndex,
-                  isDark: isDark,
-                  onTap: () => setState(() => _currentIndex = 0),
-                ),
+      // ── Bottom App Bar ──
+      bottomNavigationBar: BottomAppBar(
+        color: isDark ? const Color(0xff1E293B) : const Color(0xffFFFFFF),
+        elevation: 8,
+        notchMargin: 8,
+        shape: const CircularNotchedRectangle(),
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              // الرئيسية
+              _NavItem(
+                dest: destinations[0],
+                index: 0,
+                currentIndex: currentIndex,
+                isDark: isDark,
+                onTap: () => onTap(0),
+              ),
 
-                // طلباتي
-                _NavItem(
-                  icon: Icons.receipt_long_outlined,
-                  activeIcon: Icons.receipt_long,
-                  label: "طلباتي",
-                  index: 1,
-                  currentIndex: _currentIndex,
-                  isDark: isDark,
-                  onTap: () => setState(() => _currentIndex = 1),
-                ),
+              // طلباتي
+              _NavItem(
+                dest: destinations[1],
+                index: 1,
+                currentIndex: currentIndex,
+                isDark: isDark,
+                onTap: () => onTap(1),
+              ),
 
-                // ── Empty space for FAB ──
-                const SizedBox(width: 60),
+              // Empty space for FAB
+              const SizedBox(width: 60),
 
-                // رسائل
-                _NavItem(
-                  icon: Icons.chat_bubble_outline,
-                  activeIcon: Icons.chat_bubble,
-                  label: "رسائل",
-                  index: 2,
-                  currentIndex: _currentIndex,
-                  isDark: isDark,
-                  onTap: () => setState(() => _currentIndex = 2),
-                ),
+              // رسائل
+              _NavItem(
+                dest: destinations[2],
+                index: 2,
+                currentIndex: currentIndex,
+                isDark: isDark,
+                onTap: () => onTap(2),
+              ),
 
-                // المحفظة
-                _NavItem(
-                  icon: Icons.person,
-                  activeIcon: Icons.account_balance_wallet,
-                  label: "حسابي",
-                  index: 3,
-                  currentIndex: _currentIndex,
-                  isDark: isDark,
-                  onTap: () => setState(() => _currentIndex = 3),
-                ),
-              ],
-            ),
+              // المحفظة
+              _NavItem(
+                dest: destinations[3],
+                index: 3,
+                currentIndex: currentIndex,
+                isDark: isDark,
+                onTap: () => onTap(3),
+              ),
+            ],
           ),
         ),
       ),
@@ -168,22 +392,32 @@ class _BottomNavState extends State<BottomNav> {
   }
 }
 
-// ── Nav Item ──────────────────────────────────────────────────────────────────
+// ── Nav Destination Model ─────────────────────────────────────────────────────
 
-class _NavItem extends StatelessWidget {
-  const _NavItem({
+class _NavDestination {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+
+  const _NavDestination({
     required this.icon,
     required this.activeIcon,
     required this.label,
+  });
+}
+
+// ── Nav Item (mobile) ─────────────────────────────────────────────────────────
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.dest,
     required this.index,
     required this.currentIndex,
     required this.isDark,
     required this.onTap,
   });
 
-  final IconData icon;
-  final IconData activeIcon;
-  final String label;
+  final _NavDestination dest;
   final int index;
   final int currentIndex;
   final bool isDark;
@@ -205,13 +439,13 @@ class _NavItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              isSelected ? activeIcon : icon,
+              isSelected ? dest.activeIcon : dest.icon,
               color: isSelected ? activeColor : inactiveColor,
               size: 24,
             ),
             const SizedBox(height: 4),
             Text(
-              label,
+              dest.label,
               style: TextStyle(
                 fontFamily: "IBMPlexSansArabic",
                 fontSize: 11,
@@ -226,7 +460,7 @@ class _NavItem extends StatelessWidget {
   }
 }
 
-// ── Add Option (FAB sheet) ────────────────────────────────────────────────────
+// ── Add Option Sheet ──────────────────────────────────────────────────────────
 
 class _AddOption extends StatelessWidget {
   const _AddOption({
@@ -252,9 +486,7 @@ class _AddOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? const Color(0xff1E293B) : const Color(0xffF1F5F9),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: color.withValues(alpha: .3),
-          ),
+          border: Border.all(color: color.withOpacity(0.3)),
         ),
         child: Column(
           children: [
@@ -262,7 +494,7 @@ class _AddOption extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: color.withValues(alpha: .12),
+                color: color.withOpacity(0.12),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: color, size: 24),
