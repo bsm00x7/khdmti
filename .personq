@@ -1,0 +1,19 @@
+[33m8836510[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeatures[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/features[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m update resposive in nav buttom for web \ - make nav vertical in rigth
+[33me3b533e[m Refactor bottom navigation to BottomAppBar with FAB
+[33m1c8911a[m Use direct push for notifications button
+[33m7978f7c[m Clarify router redirect order and fallback
+[33mfd53815[m Simplify auth route list formatting
+[33mdcc1eaf[m Validate session expiration on auth check
+[33m20f552e[m Uses centralized constants for Supabase config
+[33mf572ff9[m Refactors routing and auth redirect logic
+[33m55a400b[m Adds home/profile/notification screens and controllers
+[33m92c3836[m Adds comprehensive light and dark themes
+[33mf9dc995[m Adds searchable list dependency
+[33m900665a[m Implements chat functionality with Supabase
+[33mbf5afbc[m Refactors authentication pages and adds profile model
+[33m19d8155[m Implements profile image selection and display
+[33mbb52469[m update structure folder
+[33m91a0eb6[m  update router and update same custoom widget and add screen home and earch and profile and search screen
+[33m8128266[m add logic for login and signUp and add go router for better navigator
+[33mbf96664[m completed ui for login and signUp screen
+[33mef6c32c[m init project with login screen and splash screen
