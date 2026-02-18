@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:khdmti_project/controller/message_controller.dart';
 import 'package:khdmti_project/db/auth/auth.dart';
-import 'package:khdmti_project/model/message_model.dart' show MessageModel;
-import 'package:khdmti_project/model/profile_model.dart';
+import 'package:khdmti_project/models/message_model.dart' show MessageModel;
+import 'package:khdmti_project/models/profile_model.dart';
 import 'package:provider/provider.dart';
 
 class MessageScreen extends StatelessWidget {
@@ -76,7 +76,7 @@ class _MessageViewState extends State<_MessageView> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
-        title: FutureBuilder<ProfileModel>(
+        title: FutureBuilder<UserProfileModel>(
           future: controller.fetchProfile(widget.otherUserId),
           builder: (context, snapshot) {
             return Column(

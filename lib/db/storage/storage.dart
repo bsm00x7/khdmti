@@ -1,23 +1,66 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Storage {
-  static final SupabaseClient supabase = Supabase.instance.client;
+  Storage._(); // prevent instantiation — all members are static
 
-  static Future<void> uplodeImage(
-      {required String fileName,
-      required File file,
-      required String bucketName}) async {
-    await supabase.storage.from(bucketName).upload(
-          fileName,
+  static final SupabaseClient _supabase = Supabase.instance.client;
+
+  // ── Upload from File (mobile/desktop) ─────────────────────────────────────
+
+  static Future<void> uploadFile({
+    required String bucketName,
+    required String filePath,
+    required File file,
+    String cacheControl = '3600',
+    bool upsert = false,
+  }) async {
+    await _supabase.storage.from(bucketName).upload(
+          filePath,
           file,
-          fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+          fileOptions: FileOptions(
+            cacheControl: cacheControl,
+            upsert: upsert,
+          ),
         );
   }
 
-  Future<String> getPublicUrl(
-      {required String bucketName, required String fileName}) async {
-    return supabase.storage.from(bucketName).getPublicUrl(fileName);
+  // ── Upload from Bytes (web / file_picker) ─────────────────────────────────
+
+  static Future<void> uploadBytes({
+    required String bucketName,
+    required String filePath,
+    required Uint8List bytes,
+    String? contentType,
+    bool upsert = false,
+  }) async {
+    await _supabase.storage.from(bucketName).uploadBinary(
+          filePath,
+          bytes,
+          fileOptions: FileOptions(
+            contentType: contentType,
+            upsert: upsert,
+          ),
+        );
+  }
+
+  // ── Get Public URL ────────────────────────────────────────────────────────
+
+  static String getPublicUrl({
+    required String bucketName,
+    required String filePath,
+  }) {
+    return _supabase.storage.from(bucketName).getPublicUrl(filePath);
+  }
+
+  // ── Delete ────────────────────────────────────────────────────────────────
+
+  static Future<void> deleteFile({
+    required String bucketName,
+    required String filePath,
+  }) async {
+    await _supabase.storage.from(bucketName).remove([filePath]);
   }
 }

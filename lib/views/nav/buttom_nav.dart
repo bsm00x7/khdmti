@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:khdmti_project/utils/responsive/responsive_helper.dart';
 import 'package:khdmti_project/views/home/home_screen.dart';
 import 'package:khdmti_project/views/message/chat_list_screen.dart';
+import 'package:khdmti_project/views/services/post_service_screen.dart';
 import 'package:khdmti_project/views/profile/profile_screen.dart';
 import 'package:khdmti_project/views/search/search_screen.dart';
 
@@ -59,6 +60,7 @@ class _BottomNavState extends State<BottomNav> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // ── Drag handle ──
               Container(
                 width: 40,
                 height: 4,
@@ -68,32 +70,47 @@ class _BottomNavState extends State<BottomNav> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
+
               Text(
                 "ماذا تريد أن تضيف؟",
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               const SizedBox(height: 24),
+
               Row(
                 children: [
+                  // ── نشر خدمة ──
                   Expanded(
                     child: _AddOption(
                       icon: Icons.work_outline,
                       label: "نشر خدمة",
                       color: const Color(0xff1173D4),
-                      onTap: () => Navigator.pop(context),
+                      onTap: () {
+                        Navigator.pop(context); // close sheet
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const PostServiceScreen(),
+                          ),
+                        );
+                      },
                     ),
                   ),
+
                   const SizedBox(width: 16),
+
+                  // ── طلب خدمة ──
                   Expanded(
                     child: _AddOption(
                       icon: Icons.search,
                       label: "طلب خدمة",
                       color: const Color(0xff22C55E),
-                      onTap: () => Navigator.pop(context),
+                      onTap: () => Navigator.pop(context), // wire later
                     ),
                   ),
                 ],
               ),
+
               const SizedBox(height: 16),
             ],
           ),
@@ -255,7 +272,7 @@ class _WebLayout extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? const Color(0xff1173D4).withOpacity(0.1)
+                                ? const Color(0xff1173D4).withValues(alpha: 0.1)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -376,7 +393,7 @@ class _MobileLayout extends StatelessWidget {
                 onTap: () => onTap(2),
               ),
 
-              // المحفظة
+              // حسابي
               _NavItem(
                 dest: destinations[3],
                 index: 3,
@@ -486,7 +503,7 @@ class _AddOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? const Color(0xff1E293B) : const Color(0xffF1F5F9),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -494,7 +511,7 @@ class _AddOption extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: color, size: 24),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:khdmti_project/controller/message_controller.dart';
-import 'package:khdmti_project/model/chat_model.dart';
-import 'package:khdmti_project/model/message_model.dart';
-import 'package:khdmti_project/model/profile_model.dart';
+import 'package:khdmti_project/models/chat_model.dart';
+import 'package:khdmti_project/models/message_model.dart';
+import 'package:khdmti_project/models/profile_model.dart';
 import 'package:khdmti_project/views/message/message_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -113,7 +113,7 @@ class _ChatTile extends StatelessWidget {
       ]),
       builder: (context, snapshot) {
         final profile =
-            snapshot.hasData ? snapshot.data![0] as ProfileModel : null;
+            snapshot.hasData ? snapshot.data![0] as UserProfileModel : null;
         final lastMessage =
             snapshot.hasData ? snapshot.data![1] as MessageModel? : null;
 

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:khdmti_project/model/user_model.dart';
+import 'package:khdmti_project/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Enhanced Authentication Service with comprehensive features

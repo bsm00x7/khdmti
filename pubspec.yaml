@@ -24,6 +24,7 @@ dependencies:
   uuid_v4: ^1.0.2
   rxdart: ^0.28.0
   searchable_listview: ^2.19.4
+  file_picker: ^10.3.10
 
 flutter:
   generate: true

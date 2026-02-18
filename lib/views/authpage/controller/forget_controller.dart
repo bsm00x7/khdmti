@@ -3,9 +3,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:khdmti_project/db/auth/auth.dart';
-import 'package:khdmti_project/utils/widgets/custom_error_widget.dart';
-import 'package:khdmti_project/utils/widgets/looding_indicator.dart';
-import 'package:khdmti_project/utils/widgets/success.dart';
+import 'package:khdmti_project/shared/widgets/custom_error_widget.dart';
+import 'package:khdmti_project/shared/widgets/loading_indicator.dart';
+import 'package:khdmti_project/shared/widgets/success.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ForgetController with ChangeNotifier {

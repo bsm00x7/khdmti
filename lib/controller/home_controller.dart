@@ -24,8 +24,8 @@ class HomeController with ChangeNotifier {
       notifyListeners();
       final String fileName = '$userId.png';
 
-      final url = await Storage()
-          .getPublicUrl(bucketName: 'photoProfile', fileName: fileName);
+      final url =
+          Storage.getPublicUrl(bucketName: 'photoProfile', filePath: fileName);
 
       _imageUrl = url;
     } catch (e) {

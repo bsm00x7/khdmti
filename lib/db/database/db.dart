@@ -1,7 +1,8 @@
 import 'package:khdmti_project/db/auth/auth.dart';
-import 'package:khdmti_project/model/chat_model.dart';
-import 'package:khdmti_project/model/message_model.dart';
-import 'package:khdmti_project/model/profile_model.dart';
+import 'package:khdmti_project/models/chat_model.dart';
+import 'package:khdmti_project/models/message_model.dart';
+import 'package:khdmti_project/models/profile_model.dart';
+import 'package:khdmti_project/models/user_post_model.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -101,10 +102,10 @@ class DataBase {
   }
 
   // ── Fetch a user profile ──
-  Future<ProfileModel> fetchProfile(String userId) async {
+  Future<UserProfileModel> fetchProfile(String userId) async {
     final json =
         await supabase.from('userProfile').select().eq('id', userId).single();
-    return ProfileModel.fromJson(json);
+    return UserProfileModel.fromJson(json);
   }
 
   // ── Fetch last non-deleted message in a chat ──
@@ -121,15 +122,15 @@ class DataBase {
     return result != null ? MessageModel.fromJson(result) : null;
   }
 
-  Future<ProfileModel> profileData({required String value}) async {
+  Future<UserProfileModel> profileData({required String value}) async {
     final response =
         await supabase.from('userProfile').select().eq('id', value).single();
 
-    return ProfileModel.fromJson(response);
+    return UserProfileModel.fromJson(response);
   }
 
   Future<void> insertToDataBase(AuthResponse userData) async {
-    final profile = ProfileModel(
+    final profile = UserProfileModel(
       id: userData.user!.id,
       jobTitle: "Job",
       description: "Hello My Name ${userData.user!.userMetadata!["name"]}",
@@ -140,5 +141,9 @@ class DataBase {
     );
 
     await supabase.from('userProfile').insert(profile.toJson());
+  }
+
+  Future<void> insertToUserPost(UserPostModel post) async {
+    await Supabase.instance.client.from('userPost').insert(post.toJson());
   }
 }

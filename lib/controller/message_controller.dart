@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:khdmti_project/db/auth/auth.dart';
 import 'package:khdmti_project/db/database/db.dart';
-import 'package:khdmti_project/model/chat_model.dart';
-import 'package:khdmti_project/model/message_model.dart';
-import 'package:khdmti_project/model/profile_model.dart';
+import 'package:khdmti_project/models/chat_model.dart';
+import 'package:khdmti_project/models/message_model.dart';
+import 'package:khdmti_project/models/profile_model.dart';
 
 class MessageController with ChangeNotifier {
   final DataBase _db = DataBase();
@@ -55,7 +55,7 @@ class MessageController with ChangeNotifier {
   }
 
   // ── Fetch profile ──
-  Future<ProfileModel> fetchProfile(String userId) {
+  Future<UserProfileModel> fetchProfile(String userId) {
     return _db.fetchProfile(userId);
   }
 

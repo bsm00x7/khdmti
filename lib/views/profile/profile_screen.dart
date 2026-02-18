@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:khdmti_project/controller/profile_controller.dart';
-import 'package:khdmti_project/utils/responsive/responsive_helper.dart';
+import 'package:khdmti_project/views/profile/subscreen/edit_profile_screen.dart';
+import 'package:khdmti_project/views/profile/subscreen/my_services_screen.dart';
+import 'package:khdmti_project/views/profile/subscreen/orders_history_screen.dart';
+import 'package:khdmti_project/views/profile/subscreen/wallet_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:khdmti_project/comme_widget/responsive_avatar.dart';
+
+import 'package:khdmti_project/controller/profile_controller.dart';
 import 'package:khdmti_project/db/auth/auth.dart';
+import 'package:khdmti_project/utils/responsive/responsive_helper.dart';
+import 'package:khdmti_project/comme_widget/responsive_avatar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -12,13 +17,15 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ProfileController()..init(),
-      child: const _ProfileScreenBody(),
+      child: const _ProfileBody(),
     );
   }
 }
 
-class _ProfileScreenBody extends StatelessWidget {
-  const _ProfileScreenBody();
+// ── Body ──────────────────────────────────────────────────────────────────────
+
+class _ProfileBody extends StatelessWidget {
+  const _ProfileBody();
 
   @override
   Widget build(BuildContext context) {
@@ -31,28 +38,23 @@ class _ProfileScreenBody extends StatelessWidget {
         textDirection: TextDirection.rtl,
         child: Column(
           children: [
-            // ── AppBar Row ──────────────────────────────────────────
+            // ── AppBar ────────────────────────────────────────────
             Padding(
               padding: context.pagePadding.copyWith(bottom: 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Settings icon
                   _CircleIconButton(
                     icon: Icons.settings_outlined,
                     isDark: isDark,
                     onTap: () {},
                   ),
-
-                  // Title
                   Text(
-                    "خدماتي",
+                    'حسابي',
                     style: theme.textTheme.displayMedium!.copyWith(
                       fontSize: context.adaptiveFontSize(22),
                     ),
                   ),
-
-                  // Share icon
                   _CircleIconButton(
                     icon: Icons.share_outlined,
                     isDark: isDark,
@@ -69,274 +71,253 @@ class _ProfileScreenBody extends StatelessWidget {
               height: 24,
             ),
 
-            // ── Scrollable Body ─────────────────────────────────────
+            // ── Scrollable body ───────────────────────────────────
             Expanded(
-              child: SingleChildScrollView(
-                padding: context.pagePadding.copyWith(top: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 16),
+              child: controller.isLoading && controller.profile == null
+                  ? const Center(
+                      child:
+                          CircularProgressIndicator(color: Color(0xff1173D4)))
+                  : SingleChildScrollView(
+                      padding: context.pagePadding.copyWith(top: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 16),
 
-                    // ── Avatar ────────────────────────────────────────
-                    Center(
-                      child: GestureDetector(
-                        onTap: () => controller.showImageSourceSheet(context),
-                        child: Stack(
-                          children: [
-                            // Avatar
-                            Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: const Color(0xff1173D4),
-                                  width: 3,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xff1173D4)
-                                        .withValues(alpha: .25),
-                                    blurRadius: 16,
-                                    spreadRadius: 2,
-                                  ),
-                                ],
-                              ),
-                              child: ResponsiveAvatar(
-                                imageFile: controller.imageFile,
-                                imgPath: controller.imageUrl,
-                                sizeFactor: context.responsive(
-                                  mobile: 0.28,
-                                  tablet: 0.20,
-                                  desktop: 0.14,
-                                ),
-                                showBadge: false,
-                              ),
+                          // ── Avatar ──────────────────────────────
+                          _AvatarSection(
+                              controller: controller, isDark: isDark),
+                          const SizedBox(height: 20),
+
+                          // ── Name ────────────────────────────────
+                          Text(
+                            Auth.user!.displayName,
+                            style: theme.textTheme.displayMedium!.copyWith(
+                              fontSize: context.adaptiveFontSize(24),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+
+                          // ── Job title ────────────────────────────
+                          if (controller.profile != null)
+                            _JobTitleBadge(
+                              title: controller.profile!.jobTitle,
+                              context: context,
+                              theme: theme,
                             ),
 
-                            // Uploading overlay
-                            if (controller.isUploading)
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.black.withValues(alpha: .45),
-                                  ),
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 3,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                            // Camera badge
-                            Positioned(
-                              bottom: 4,
-                              left: 4,
-                              child: Container(
-                                width: 34,
-                                height: 34,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xff1173D4),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: isDark
-                                        ? const Color(0xff0F172A)
-                                        : Colors.white,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.white,
-                                  size: 16,
+                          // ── Bio ──────────────────────────────────
+                          if (controller.profile?.description != null) ...[
+                            const SizedBox(height: 12),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: Text(
+                                controller.profile!.description!,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.bodyMedium!.copyWith(
+                                  color: isDark
+                                      ? const Color(0xff94A3B8)
+                                      : const Color(0xff64748B),
+                                  fontSize: context.adaptiveFontSize(13),
                                 ),
                               ),
                             ),
                           ],
-                        ),
-                      ),
-                    ),
 
-                    const SizedBox(height: 20),
+                          const SizedBox(height: 32),
 
-                    // ── Name ──────────────────────────────────────────
-                    Text(
-                      Auth.user!.displayName,
-                      style: theme.textTheme.displayMedium!.copyWith(
-                        fontSize: context.adaptiveFontSize(24),
-                      ),
-                    ),
+                          // ── Stats ────────────────────────────────
+                          _StatsCard(
+                              isDark: isDark,
+                              profile: controller.profile,
+                              context: context),
 
-                    const SizedBox(height: 6),
+                          const SizedBox(height: 24),
 
-                    // ── Job title ─────────────────────────────────────
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: const Color(0xff1173D4).withValues(alpha: .12),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        "مستقل · Job",
-                        style: theme.textTheme.bodyMedium!.copyWith(
-                          color: const Color(0xff1173D4),
-                          fontWeight: FontWeight.w600,
-                          fontSize: context.adaptiveFontSize(13),
-                        ),
-                      ),
-                    ),
+                          // ── Skills ───────────────────────────────
+                          if (controller.profile?.skillsList.isNotEmpty ??
+                              false) ...[
+                            _SkillsSection(
+                              skills: controller.profile!.skillsList,
+                              isDark: isDark,
+                              theme: theme,
+                              context: context,
+                            ),
+                            const SizedBox(height: 24),
+                          ],
 
-                    const SizedBox(height: 32),
-
-                    // ── Stats Row ─────────────────────────────────────
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 18, horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xff1E293B)
-                            : const Color(0xffFFFFFF),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: .05),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _StatItem(
-                            value: "12",
-                            label: "خدماتي",
+                          // ── Main menu ────────────────────────────
+                          _MenuSection(
                             isDark: isDark,
-                          ),
-                          _VerticalDivider(isDark: isDark),
-                          _StatItem(
-                            value: "4.8",
-                            label: "التقييم",
-                            isDark: isDark,
-                            icon: Icons.star_rounded,
-                            iconColor: const Color(0xffEAB308),
-                          ),
-                          _VerticalDivider(isDark: isDark),
-                          _StatItem(
-                            value: "38",
-                            label: "مكتملة",
-                            isDark: isDark,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // ── Menu Items ────────────────────────────────────
-                    _MenuSection(
-                      isDark: isDark,
-                      items: [
-                        _MenuItem(
-                          icon: Icons.person_outline,
-                          iconColor: const Color(0xff1173D4),
-                          title: "تعديل الملف الشخصي",
-                          onTap: () {},
-                        ),
-                        _MenuItem(
-                          icon: Icons.work_outline,
-                          iconColor: const Color(0xff22C55E),
-                          title: "خدماتي",
-                          onTap: () {},
-                        ),
-                        _MenuItem(
-                          icon: Icons.history,
-                          iconColor: const Color(0xffA855F7),
-                          title: "سجل الطلبات",
-                          onTap: () {},
-                        ),
-                        _MenuItem(
-                          icon: Icons.wallet_outlined,
-                          iconColor: const Color(0xffF97316),
-                          title: "المحفظة والمدفوعات",
-                          onTap: () {},
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    _MenuSection(
-                      isDark: isDark,
-                      items: [
-                        _MenuItem(
-                          icon: Icons.notifications_outlined,
-                          iconColor: const Color(0xff38BDF8),
-                          title: "الإشعارات",
-                          onTap: () {},
-                        ),
-                        _MenuItem(
-                          icon: Icons.lock_outline,
-                          iconColor: const Color(0xff64748B),
-                          title: "الأمان والخصوصية",
-                          onTap: () {},
-                        ),
-                        _MenuItem(
-                          icon: Icons.help_outline,
-                          iconColor: const Color(0xffEAB308),
-                          title: "المساعدة والدعم",
-                          onTap: () {},
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // ── Sign Out Button ───────────────────────────────
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: OutlinedButton.icon(
-                        icon: controller.isSigningOut
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.red,
+                            items: [
+                              _MenuItem(
+                                icon: Icons.person_outline,
+                                iconColor: const Color(0xff1173D4),
+                                title: 'تعديل الملف الشخصي',
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        ChangeNotifierProvider.value(
+                                      value: controller,
+                                      child: const EditProfileScreen(),
+                                    ),
+                                  ),
                                 ),
-                              )
-                            : const Icon(
-                                Icons.logout,
-                                color: Colors.red,
                               ),
-                        label: Text(
-                          'تسجيل الخروج',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: context.adaptiveFontSize(15),
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'IBMPlexSansArabic',
+                              _MenuItem(
+                                icon: Icons.work_outline,
+                                iconColor: const Color(0xff22C55E),
+                                title: 'خدماتي',
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const MyServicesScreen(),
+                                  ),
+                                ),
+                              ),
+                              _MenuItem(
+                                icon: Icons.history,
+                                iconColor: const Color(0xffA855F7),
+                                title: 'سجل الطلبات',
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const OrdersHistoryScreen(),
+                                  ),
+                                ),
+                              ),
+                              _MenuItem(
+                                icon: Icons.wallet_outlined,
+                                iconColor: const Color(0xffF97316),
+                                title: 'المحفظة والمدفوعات',
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const WalletScreen(),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.red, width: 1.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+
+                          const SizedBox(height: 16),
+
+                          // ── Settings menu ─────────────────────────
+                          _MenuSection(
+                            isDark: isDark,
+                            items: [
+                              _MenuItem(
+                                icon: Icons.notifications_outlined,
+                                iconColor: const Color(0xff38BDF8),
+                                title: 'الإشعارات',
+                                onTap: () {},
+                              ),
+                              _MenuItem(
+                                icon: Icons.lock_outline,
+                                iconColor: const Color(0xff64748B),
+                                title: 'الأمان والخصوصية',
+                                onTap: () {},
+                              ),
+                              _MenuItem(
+                                icon: Icons.help_outline,
+                                iconColor: const Color(0xffEAB308),
+                                title: 'المساعدة والدعم',
+                                onTap: () {},
+                              ),
+                            ],
                           ),
-                        ),
-                        onPressed: controller.isSigningOut
-                            ? null
-                            : () => controller.showSignOutDialog(context),
+
+                          const SizedBox(height: 24),
+
+                          // ── Sign out ──────────────────────────────
+                          _SignOutButton(
+                              controller: controller, context: context),
+
+                          const SizedBox(height: 32),
+                        ],
                       ),
                     ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-                    const SizedBox(height: 32),
-                  ],
+// ── Avatar Section ────────────────────────────────────────────────────────────
+
+class _AvatarSection extends StatelessWidget {
+  const _AvatarSection({required this.controller, required this.isDark});
+
+  final ProfileController controller;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: GestureDetector(
+        onTap: () => controller.showImageSourceSheet(context),
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xff1173D4), width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xff1173D4).withValues(alpha: .25),
+                    blurRadius: 16,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: ResponsiveAvatar(
+                imageFile: controller.imageFile,
+                imgPath: controller.imageUrl,
+                sizeFactor: context.responsive(
+                  mobile: 0.28,
+                  tablet: 0.20,
+                  desktop: 0.14,
                 ),
+                showBadge: false,
+              ),
+            ),
+
+            // Upload overlay
+            if (controller.isUploading)
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black.withValues(alpha: .45),
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 3),
+                  ),
+                ),
+              ),
+
+            // Camera badge
+            Positioned(
+              bottom: 4,
+              left: 4,
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: const Color(0xff1173D4),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isDark ? const Color(0xff0F172A) : Colors.white,
+                    width: 2,
+                  ),
+                ),
+                child:
+                    const Icon(Icons.camera_alt, color: Colors.white, size: 16),
               ),
             ),
           ],
@@ -346,7 +327,204 @@ class _ProfileScreenBody extends StatelessWidget {
   }
 }
 
-// ── Circle Icon Button ───────────────────────────────────────────────────────
+// ── Job Title Badge ───────────────────────────────────────────────────────────
+
+class _JobTitleBadge extends StatelessWidget {
+  const _JobTitleBadge({
+    required this.title,
+    required this.context,
+    required this.theme,
+  });
+
+  final String title;
+  final BuildContext context;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color(0xff1173D4).withValues(alpha: .12),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        'مستقل · $title',
+        style: theme.textTheme.bodyMedium!.copyWith(
+          color: const Color(0xff1173D4),
+          fontWeight: FontWeight.w600,
+          fontSize: context.adaptiveFontSize(13),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Stats Card ────────────────────────────────────────────────────────────────
+
+class _StatsCard extends StatelessWidget {
+  const _StatsCard({
+    required this.isDark,
+    required this.profile,
+    required this.context,
+  });
+
+  final bool isDark;
+  final dynamic profile;
+  final BuildContext context;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xff1E293B) : const Color(0xffFFFFFF),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _StatItem(
+            value: profile?.completedProject.toString() ?? '0',
+            label: 'مكتملة',
+            isDark: isDark,
+          ),
+          _VerticalDivider(isDark: isDark),
+          _StatItem(
+            value: '${profile?.successRate ?? 0}%',
+            label: 'نسبة النجاح',
+            isDark: isDark,
+            icon: Icons.star_rounded,
+            iconColor: const Color(0xffEAB308),
+          ),
+          _VerticalDivider(isDark: isDark),
+          _StatItem(
+            value: '${profile?.numberofYearsExperince ?? 0} سنة',
+            label: 'الخبرة',
+            isDark: isDark,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Skills Section ────────────────────────────────────────────────────────────
+
+class _SkillsSection extends StatelessWidget {
+  const _SkillsSection({
+    required this.skills,
+    required this.isDark,
+    required this.theme,
+    required this.context,
+  });
+
+  final List<String> skills;
+  final bool isDark;
+  final ThemeData theme;
+  final BuildContext context;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'المهارات',
+            style: theme.textTheme.titleSmall!.copyWith(
+              fontSize: context.adaptiveFontSize(15),
+              fontWeight: FontWeight.w700,
+              color: isDark ? const Color(0xffF1F5F9) : const Color(0xff1E293B),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: skills
+                .map(
+                  (skill) => Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xff1173D4).withValues(alpha: .1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xff1173D4).withValues(alpha: .3),
+                      ),
+                    ),
+                    child: Text(
+                      skill,
+                      style: theme.textTheme.bodySmall!.copyWith(
+                        color: const Color(0xff1173D4),
+                        fontWeight: FontWeight.w500,
+                        fontSize: context.adaptiveFontSize(12),
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Sign Out Button ───────────────────────────────────────────────────────────
+
+class _SignOutButton extends StatelessWidget {
+  const _SignOutButton({required this.controller, required this.context});
+
+  final ProfileController controller;
+  final BuildContext context;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: OutlinedButton.icon(
+        icon: controller.isSigningOut
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: Colors.red),
+              )
+            : const Icon(Icons.logout, color: Colors.red),
+        label: Text(
+          'تسجيل الخروج',
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: context.adaptiveFontSize(15),
+            fontWeight: FontWeight.w600,
+            fontFamily: 'IBMPlexSansArabic',
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.red, width: 1.5),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        onPressed: controller.isSigningOut
+            ? null
+            : () => controller.showSignOutDialog(context),
+      ),
+    );
+  }
+}
+
+// ── Shared sub-widgets ────────────────────────────────────────────────────────
 
 class _CircleIconButton extends StatelessWidget {
   const _CircleIconButton({
@@ -386,8 +564,6 @@ class _CircleIconButton extends StatelessWidget {
   }
 }
 
-// ── Stat Item ────────────────────────────────────────────────────────────────
-
 class _StatItem extends StatelessWidget {
   const _StatItem({
     required this.value,
@@ -417,7 +593,7 @@ class _StatItem extends StatelessWidget {
             Text(
               value,
               style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                    fontSize: context.adaptiveFontSize(22),
+                    fontSize: context.adaptiveFontSize(20),
                     color: const Color(0xff1173D4),
                   ),
             ),
@@ -427,15 +603,13 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                fontSize: context.adaptiveFontSize(12),
+                fontSize: context.adaptiveFontSize(11),
               ),
         ),
       ],
     );
   }
 }
-
-// ── Vertical Divider ─────────────────────────────────────────────────────────
 
 class _VerticalDivider extends StatelessWidget {
   const _VerticalDivider({required this.isDark});
@@ -451,13 +625,8 @@ class _VerticalDivider extends StatelessWidget {
   }
 }
 
-// ── Menu Section ─────────────────────────────────────────────────────────────
-
 class _MenuSection extends StatelessWidget {
-  const _MenuSection({
-    required this.isDark,
-    required this.items,
-  });
+  const _MenuSection({required this.isDark, required this.items});
 
   final bool isDark;
   final List<_MenuItem> items;
@@ -478,12 +647,10 @@ class _MenuSection extends StatelessWidget {
       ),
       child: Column(
         children: items.asMap().entries.map((entry) {
-          final index = entry.key;
-          final item = entry.value;
           return Column(
             children: [
-              item,
-              if (index < items.length - 1)
+              entry.value,
+              if (entry.key < items.length - 1)
                 Divider(
                   height: 1,
                   color: isDark
@@ -498,8 +665,6 @@ class _MenuSection extends StatelessWidget {
     );
   }
 }
-
-// ── Menu Item ────────────────────────────────────────────────────────────────
 
 class _MenuItem extends StatelessWidget {
   const _MenuItem({
@@ -526,7 +691,6 @@ class _MenuItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            // Icon box
             Container(
               width: 36,
               height: 36,
@@ -536,10 +700,7 @@ class _MenuItem extends StatelessWidget {
               ),
               child: Icon(icon, color: iconColor, size: 20),
             ),
-
             const SizedBox(width: 14),
-
-            // Title
             Expanded(
               child: Text(
                 title,
@@ -551,8 +712,6 @@ class _MenuItem extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Arrow
             Icon(
               Icons.arrow_back_ios,
               size: 14,
