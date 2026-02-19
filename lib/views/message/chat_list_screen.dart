@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:khdmti_project/controller/message_controller.dart';
 import 'package:khdmti_project/models/chat_model.dart';
 import 'package:khdmti_project/models/message_model.dart';
 import 'package:khdmti_project/models/profile_model.dart';
 import 'package:khdmti_project/views/message/message_screen.dart';
-import 'package:provider/provider.dart';
 
 class ChatsListScreen extends StatelessWidget {
   const ChatsListScreen({super.key});
@@ -13,73 +14,136 @@ class ChatsListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => MessageController(),
-      child: const _ChatsListView(),
+      child: const _ChatsListBody(),
     );
   }
 }
 
-class _ChatsListView extends StatelessWidget {
-  const _ChatsListView();
+class _ChatsListBody extends StatelessWidget {
+  const _ChatsListBody();
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final controller = context.read<MessageController>();
 
-    return Scaffold(
-      body: SafeArea(
-        child: StreamBuilder<List<ChatModel>>(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor:
+            isDark ? const Color(0xff0F172A) : const Color(0xffF8FAFC),
+        appBar: AppBar(
+          backgroundColor: isDark ? const Color(0xff1E293B) : Colors.white,
+          elevation: 0,
+          centerTitle: true,
+          title: Text(
+            'المحادثات',
+            style: TextStyle(
+              fontFamily: 'IBMPlexSansArabic',
+              fontWeight: FontWeight.w700,
+              fontSize: 18,
+              color: isDark ? Colors.white : const Color(0xff1E293B),
+            ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(
+              height: 1,
+              color: isDark ? const Color(0xff334155) : const Color(0xffE2E8F0),
+            ),
+          ),
+        ),
+        body: StreamBuilder<List<ChatModel>>(
           stream: controller.chatsStream,
           builder: (context, snapshot) {
+            // ── Loading ──
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-
-            final chats = snapshot.data ?? [];
-
-            if (chats.isEmpty) {
               return const Center(
+                child: CircularProgressIndicator(color: Color(0xff1173D4)),
+              );
+            }
+
+            // ── Error ──
+            if (snapshot.hasError) {
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.chat_bubble_outline,
-                        size: 64, color: Colors.grey),
-                    SizedBox(height: 12),
-                    Text(
-                      'No conversations yet',
-                      style: TextStyle(color: Colors.grey, fontSize: 16),
-                    ),
+                    const Icon(Icons.error_outline,
+                        color: Colors.red, size: 48),
+                    const SizedBox(height: 12),
+                    Text('حدث خطأ في تحميل المحادثات',
+                        style: TextStyle(
+                          fontFamily: 'IBMPlexSansArabic',
+                          color: isDark
+                              ? const Color(0xff94A3B8)
+                              : const Color(0xff64748B),
+                        )),
                   ],
                 ),
               );
             }
 
+            final chats = snapshot.data ?? [];
+
+            // ── Empty ──
+            if (chats.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: const Color(0xff1173D4).withValues(alpha: .08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.chat_bubble_outline,
+                          size: 40, color: Color(0xff1173D4)),
+                    ),
+                    const SizedBox(height: 16),
+                    Text('لا توجد محادثات بعد',
+                        style: TextStyle(
+                          fontFamily: 'IBMPlexSansArabic',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? const Color(0xffF1F5F9)
+                              : const Color(0xff1E293B),
+                        )),
+                    const SizedBox(height: 8),
+                    Text('ستبدأ محادثاتك عند قبول أحد الطلبات',
+                        style: TextStyle(
+                          fontFamily: 'IBMPlexSansArabic',
+                          fontSize: 13,
+                          color: isDark
+                              ? const Color(0xff64748B)
+                              : const Color(0xff94A3B8),
+                        )),
+                  ],
+                ),
+              );
+            }
+
+            // ── List ──
             return ListView.separated(
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: chats.length,
-              separatorBuilder: (_, __) => const Divider(height: 1, indent: 72),
-              itemBuilder: (context, index) {
-                final chat = chats[index];
-                final otherUserId = controller.getOtherUserId(chat);
-
+              separatorBuilder: (_, __) => Divider(
+                height: 1,
+                indent: 76,
+                color:
+                    isDark ? const Color(0xff334155) : const Color(0xffF1F5F9),
+              ),
+              itemBuilder: (_, i) {
+                final chat = chats[i];
+                final otherUserId = controller.getOtherUserId(chat)!;
                 return _ChatTile(
                   chat: chat,
-                  otherUserId: otherUserId!,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ChangeNotifierProvider(
-                        create: (_) => MessageController(),
-                        child: MessageScreen(
-                          idChat: chat.idChat.toString(),
-                          otherUserId: otherUserId,
-                        ),
-                      ),
-                    ),
-                  ),
+                  otherUserId: otherUserId,
+                  isDark: isDark,
+                  controller: controller,
                 );
               },
             );
@@ -90,22 +154,23 @@ class _ChatsListView extends StatelessWidget {
   }
 }
 
-// ── Chat Tile ──
-class _ChatTile extends StatelessWidget {
-  final ChatModel chat;
-  final String otherUserId;
-  final VoidCallback onTap;
+// ── Chat Tile ─────────────────────────────────────────────────────────────────
 
+class _ChatTile extends StatelessWidget {
   const _ChatTile({
     required this.chat,
     required this.otherUserId,
-    required this.onTap,
+    required this.isDark,
+    required this.controller,
   });
+
+  final ChatModel chat;
+  final String otherUserId;
+  final bool isDark;
+  final MessageController controller;
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<MessageController>();
-
     return FutureBuilder<List<dynamic>>(
       future: Future.wait([
         controller.fetchProfile(otherUserId),
@@ -114,26 +179,28 @@ class _ChatTile extends StatelessWidget {
       builder: (context, snapshot) {
         final profile =
             snapshot.hasData ? snapshot.data![0] as UserProfileModel : null;
-        final lastMessage =
+        final lastMsg =
             snapshot.hasData ? snapshot.data![1] as MessageModel? : null;
 
-        final jobTitle = profile?.jobTitle ?? '...';
-        final lastContent = lastMessage?.content ?? 'No messages yet';
-        final lastTime = lastMessage != null
-            ? controller.formatTime(lastMessage.createdAt.toIso8601String())
+        final name = profile?.jobTitle ?? '...';
+        final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+        final preview = lastMsg?.content ?? 'لا توجد رسائل بعد';
+        final time = lastMsg != null
+            ? controller.formatTime(lastMsg.createdAt.toIso8601String())
             : '';
 
         return ListTile(
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           leading: CircleAvatar(
             radius: 26,
-            backgroundColor: Colors.blue.shade100,
+            backgroundColor: const Color(0xff1173D4).withValues(alpha: .12),
             child: Text(
-              jobTitle.isNotEmpty ? jobTitle[0].toUpperCase() : '?',
+              initial,
               style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
+                fontFamily: 'IBMPlexSansArabic',
+                fontWeight: FontWeight.w700,
+                color: Color(0xff1173D4),
                 fontSize: 18,
               ),
             ),
@@ -143,29 +210,57 @@ class _ChatTile extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  jobTitle,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 15),
+                  name,
+                  style: TextStyle(
+                    fontFamily: 'IBMPlexSansArabic',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    color: isDark
+                        ? const Color(0xffF1F5F9)
+                        : const Color(0xff1E293B),
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (lastTime.isNotEmpty)
+              if (time.isNotEmpty) ...[
+                const SizedBox(width: 8),
                 Text(
-                  lastTime,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                  time,
+                  style: const TextStyle(
+                    fontFamily: 'IBMPlexSansArabic',
+                    fontSize: 11,
+                    color: Color(0xff94A3B8),
+                  ),
                 ),
+              ],
             ],
           ),
           subtitle: Padding(
-            padding: const EdgeInsets.only(top: 2),
+            padding: const EdgeInsets.only(top: 3),
             child: Text(
-              lastContent,
+              preview,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+              style: TextStyle(
+                fontFamily: 'IBMPlexSansArabic',
+                fontSize: 12,
+                color:
+                    isDark ? const Color(0xff64748B) : const Color(0xff94A3B8),
+              ),
             ),
           ),
-          onTap: onTap,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ChangeNotifierProvider(
+                create: (_) => MessageController(),
+                child: MessageScreen(
+                  idChat: chat.idChat.toString(),
+                  otherUserId: otherUserId,
+                ),
+              ),
+            ),
+          ),
         );
       },
     );
