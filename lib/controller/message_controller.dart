@@ -4,6 +4,7 @@ import 'package:khdmti_project/db/database/db.dart';
 import 'package:khdmti_project/models/chat_model.dart';
 import 'package:khdmti_project/models/message_model.dart';
 import 'package:khdmti_project/models/profile_model.dart';
+import 'package:provider/provider.dart';
 
 class MessageController with ChangeNotifier {
   final DataBase _db = DataBase();
@@ -24,9 +25,7 @@ class MessageController with ChangeNotifier {
     return chat.idUser1 == me ? chat.idUser2 : chat.idUser1;
   }
 
-  // ── Get or create a chat between two users, return idChat ──
-  /// Called when navigating from RequestScreen (we only have otherUserId).
-  /// Returns the existing chat UUID or creates a new one.
+  // ── Get or create a chat, return idChat UUID ───────────────
   Future<String> getOrCreateChat(String otherUserId) async {
     final me = Auth.getUserId()!;
     return await _db.getOrCreateChat(userId1: me, userId2: otherUserId);
@@ -47,16 +46,18 @@ class MessageController with ChangeNotifier {
       );
     } catch (e) {
       error = e.toString();
+      debugPrint('sendMessage error: $e');
       notifyListeners();
     }
   }
 
-  // ── Delete (soft delete) ───────────────────────────────────
+  // ── Soft delete ────────────────────────────────────────────
   Future<void> deleteMessage(int messageId) async {
     try {
       await _db.deleteMessage(messageId);
     } catch (e) {
       error = e.toString();
+      debugPrint('deleteMessage error: $e');
       notifyListeners();
     }
   }
@@ -65,22 +66,27 @@ class MessageController with ChangeNotifier {
   Future<UserProfileModel> fetchProfile(String userId) =>
       _db.fetchProfile(userId);
 
-  // ── Last message preview for chat list ─────────────────────
+  // ── Last message preview for chat list tile ────────────────
   Future<MessageModel?> fetchLastMessage(String idChat) =>
       _db.fetchLastMessage(idChat);
 
-  // ── Format timestamp (Arabic) ──────────────────────────────
+  // ── Format timestamp → Arabic-friendly string ──────────────
   String formatTime(String isoDate) {
     final date = DateTime.parse(isoDate).toLocal();
-    final now = DateTime.now();
-    final diff = now.difference(date);
+    final diff = DateTime.now().difference(date);
 
     if (diff.inDays == 0) {
-      return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+      final h = date.hour.toString().padLeft(2, '0');
+      final m = date.minute.toString().padLeft(2, '0');
+      return '$h:$m';
     } else if (diff.inDays == 1) {
       return 'أمس';
     } else {
       return '${date.day}/${date.month}/${date.year}';
     }
   }
+
+  // ── Convenience: read controller from context ──────────────
+  static MessageController of(BuildContext context) =>
+      context.read<MessageController>();
 }

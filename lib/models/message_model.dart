@@ -1,56 +1,49 @@
+/// Matches table: public.message
+/// Columns: id, created_at, "idChat", "isDeleted", content, "idSender"
 class MessageModel {
   final int? id;
-  final String idChat;
-  final String? idSender;
   final DateTime createdAt;
+  final String idChat; // uuid — FK to chats."idChat"
   final bool isDeleted;
   final String content;
+  final String?
+      idSender; // uuid — FK to auth.users.id (nullable, default auth.uid())
 
-  MessageModel({
+  const MessageModel({
     this.id,
-    required this.idChat,
-    this.idSender,
     DateTime? createdAt,
+    required this.idChat,
     this.isDeleted = false,
-    this.content = '',
-  }) : createdAt = createdAt ?? DateTime.now();
+    required this.content,
+    this.idSender,
+  }) : createdAt = createdAt ?? const _Now(); // handled below
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(
       id: json['id'] as int?,
-      idChat: json['idChat'] as String,
-      idSender: json['idSender'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      isDeleted: json['isDeleted'] as bool? ?? false,
-      content: json['content'] as String? ?? '',
+      createdAt: DateTime.parse(json['created_at']),
+      idChat: json['idChat'],
+      isDeleted: json['isDeleted'] ?? false,
+      content: json['content'],
+      idSender: json['idSender'],
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      if (id != null) 'id': id,
-      'idChat': idChat,
-      if (idSender != null) 'idSender': idSender,
-      'isDeleted': isDeleted,
-      'content': content,
-    };
-  }
+  /// Only send the fields required for INSERT.
+  /// idSender  → omitted, DB defaults to auth.uid()
+  /// isDeleted → omitted, DB defaults to false
+  /// id        → omitted, DB auto-generates
+  /// created_at→ omitted, DB defaults to now()
+  Map<String, dynamic> toJson() => {
+        'idChat': idChat,
+        'content': content,
+      };
+}
 
-  MessageModel copyWith({
-    int? id,
-    String? idChat,
-    String? idSender,
-    DateTime? createdAt,
-    bool? isDeleted,
-    String? content,
-  }) {
-    return MessageModel(
-      id: id ?? this.id,
-      idChat: idChat ?? this.idChat,
-      idSender: idSender ?? this.idSender,
-      createdAt: createdAt ?? this.createdAt,
-      isDeleted: isDeleted ?? this.isDeleted,
-      content: content ?? this.content,
-    );
-  }
+// Workaround: const constructor can't call DateTime.now(),
+// so we use a real default in the factory / named constructor.
+class _Now implements DateTime {
+  const _Now();
+  @override
+  noSuchMethod(i) => DateTime.now();
 }
