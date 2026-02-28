@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:khdmti_project/comme_widget/betaWidget.dart';
 import 'package:khdmti_project/comme_widget/custom_form_filde.dart';
 import 'package:khdmti_project/views/authpage/controller/sign_up_controller.dart';
 import 'package:khdmti_project/views/authpage/login_screen.dart';
@@ -49,7 +50,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
                 child: Column(
                   children: [
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
+                    Betawidget(),
+                    const SizedBox(height: 10),
 
                     // Logo and Title
                     Center(
